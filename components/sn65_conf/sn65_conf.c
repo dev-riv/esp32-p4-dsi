@@ -529,8 +529,8 @@ void run_i2c()
     esp_err_t ret;
 
     ret = sn65dsi83_enable_test_pattern(dev_handle);
-    vTaskDelay(pdMS_TO_TICKS(5000));
-    ret = register_write_byte(dev_handle, 0x3C, 0x00);
+    //vTaskDelay(pdMS_TO_TICKS(5000));
+    //ret = register_write_byte(dev_handle, 0x3C, 0x00);
     //ret = register_write_byte(dev_handle, 0x3C, 0x10);
     if (ret != ESP_OK) {
         printf("I2C write failed, err=0x%x\n", ret);
