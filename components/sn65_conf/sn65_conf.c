@@ -131,98 +131,103 @@ static esp_err_t sn65dsi83_enable_test_pattern(i2c_master_dev_handle_t dev_handl
 {
     esp_err_t ret;
     //ADDitional start 
-    ret = register_write_byte(dev_handle, 0x0a, 0x08);   // Low 8 bits
+    ret = register_write_byte(dev_handle, 0x0a, 0x04);// clock range 62.5-87.5
     if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x0b, 0x01);   // High 4 bits
+    ret = register_write_byte(dev_handle, 0x0b, 0x01);// Ref Clock multy 
 
     if (ret != ESP_OK) return ret;
-    
-    ret = register_write_byte(dev_handle, 0x0d, 0x01);   // Low 8 bits
+    ret = register_write_byte(dev_handle, 0x0d, 0x01);// Pll en 01
     if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x10, 0x36);   // High 4 bits
-    if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x12, 0x64);   // Low 8 bits
-    if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x18, 0x12);   // High 4 bits
-    if (ret != ESP_OK) return ret;
-    
-
-    ret = register_write_byte(dev_handle, 0x19, 0x00);   // Low 8 bits
-    if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x1a, 0x03);   // High 4 bits
-    if (ret != ESP_OK) return ret;
-   // ADDitional end 
-    // LVDS regs
-    //ret = register_write_byte(dev_handle, 0x18, 0x78);   // Low 8 bits
+    //ret = register_write_byte(dev_handle, 0x10, 0x36);   // High 4 bits
     //if (ret != ESP_OK) return ret;
-    //ret = register_write_byte(dev_handle, 0x19, 0x00);   // High 4 bits
+    //ret = register_write_byte(dev_handle, 0x12, 0x64);   // Low 8 bits
+    //if (ret != ESP_OK) return ret;
+    //ret = register_write_byte(dev_handle, 0x18, 0x18);   // High 4 bits
     //if (ret != ESP_OK) return ret;
     //
-    //ret = register_write_byte(dev_handle, 0x1A, 0x03);   // Low 8 bits
+
+    //ret = register_write_byte(dev_handle, 0x19, 0x05);   // Low 8 bits
     //if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x1B, 0x00);   // High 4 bits
-    if (ret != ESP_OK) return ret;
+    //ret = register_write_byte(dev_handle, 0x1a, 0x03);   // High 4 bits
+    //if (ret != ESP_OK) return ret;
+    //ret = register_write_byte(dev_handle, 0x1B, 0x00);   // High 4 bits
+    //if (ret != ESP_OK) return ret;
 
     // Active line length (horizontal resolution) = 1280 (0x320)
-    ret = register_write_byte(dev_handle, 0x20, 0x00);   // Low 8 bits
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_ACTIVE_LINE_LENGTH_LOW, 0x00);   // Low 8 bits
     if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x21, 0x05);   // High 4 bits
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_ACTIVE_LINE_LENGTH_HIGH, 0x05);   // High 4 bits
     if (ret != ESP_OK) return ret;
     // NEED 0 fill 0 
-    ret = register_write_byte(dev_handle, 0x22, 0x00);   // Low 8 bits
-    if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x23, 0x00);   // High 4 bits
-    if (ret != ESP_OK) return ret;
+    //ret = register_write_byte(dev_handle, 0x22, 0x00);   // Low 8 bits
+    //if (ret != ESP_OK) return ret;
+    //ret = register_write_byte(dev_handle, 0x23, 0x00);   // High 4 bits
+    //if (ret != ESP_OK) return ret;
 
     // Vertical display size = 800 (0x320)
-    ret = register_write_byte(dev_handle, 0x24, 0x20);   // Low 8 bits
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_VERTICAL_DISPLAY_SIZE_LOW, 0x20);   // Low 8 bits
     if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x25, 0x03);   // High 4 bits
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_VERTICAL_DISPLAY_SIZE_HIGH, 0x03);   // High 4 bits
     if (ret != ESP_OK) return ret;
     // NEED 0 fill 0 
-    ret = register_write_byte(dev_handle, 0x26, 0x00);   // Low 8 bits
-    if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x27, 0x00);   // High 4 bits
-    if (ret != ESP_OK) return ret;
+    //ret = register_write_byte(dev_handle, 0x26, 0x00);   // Low 8 bits
+    //if (ret != ESP_OK) return ret;
+    //ret = register_write_byte(dev_handle, 0x27, 0x00);   // High 4 bits
+    //if (ret != ESP_OK) return ret;
 
-    // Sync delay = 40 pixels (must be >= 32)
-    ret = register_write_byte(dev_handle, 0x28, 0x21);   // Low 8 bits
-    if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x29, 0x00);   // High 4 bits
-    if (ret != ESP_OK) return ret;
+    //// Sync delay = 40 pixels (must be >= 32)
+    //ret = register_write_byte(dev_handle, 0x28, 0x21);   // Low 8 bits
+    //if (ret != ESP_OK) return ret;
+    //ret = register_write_byte(dev_handle, 0x29, 0x00);   // High 4 bits
+    //if (ret != ESP_OK) return ret;
 
-    // NEED 0 fill 0
-    ret = register_write_byte(dev_handle, 0x2A, 0x00);   // Low 8 bits
-    if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x2B, 0x00);   // High 4 bits
-    if (ret != ESP_OK) return ret;
+    //// NEED 0 fill 0
+    //ret = register_write_byte(dev_handle, 0x2A, 0x00);   // Low 8 bits
+    //if (ret != ESP_OK) return ret;
+    //ret = register_write_byte(dev_handle, 0x2B, 0x00);   // High 4 bits
+    //if (ret != ESP_OK) return ret;
 
     // HSync pulse width = 128 pixels
-    ret = register_write_byte(dev_handle, 0x2C, 0x14);   // Low 8 bits
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_HSYNC_PULSE_WIDTH_LOW, 0x10);   // Low 8 bits
     if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x2D, 0x00);   // High 2 bits
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_HSYNC_PULSE_WIDTH_HIGH, 0x00);   // High 2 bits
     if (ret != ESP_OK) return ret;
 
     // VSync pulse width = 4 lines
+    //ret = register_write_byte(dev_handle,
+    //    REG_VID_CHA_VSYNC_PULSE_WIDTH_LOW, 0x0a);   // Low 8 bits
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_SYNC_DELAY_LOW, 0x20);   // Low 8 bits
     ret = register_write_byte(dev_handle, 0x30, 0x0a);   // Low 8 bits
     if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x31, 0x00);   // High 2 bits
+//    ret = register_write_byte(dev_handle,
+//        REG_VID_CHA_VSYNC_PULSE_WIDTH_HIGH, 0x00);   // High 2 bits
     if (ret != ESP_OK) return ret;
 
     // Horizontal back porch = 88 pixels
-    ret = register_write_byte(dev_handle, 0x34, 0x58);
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_HORIZONTAL_BACK_PORCH, 0x44);
     if (ret != ESP_OK) return ret;
 
     // Vertical back porch = 23 lines
-    ret = register_write_byte(dev_handle, 0x36, 0x17);
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_VERTICAL_BACK_PORCH , 0x0d);
     if (ret != ESP_OK) return ret;
 
     // Horizontal front porch = 40 pixels
-    ret = register_write_byte(dev_handle, 0x38, 0x48);
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_HORIZONTAL_FRONT_PORCH, 0x48);
     if (ret != ESP_OK) return ret;
 
     // Vertical front porch = 1 line
-    ret = register_write_byte(dev_handle, 0x3A, 0x0f);
+    ret = register_write_byte(dev_handle,
+        REG_VID_CHA_VERTICAL_FRONT_PORCH, 0x0f);
     if (ret != ESP_OK) return ret;
 
     // Enable test pattern generation (bit 4 at 0x3C)
@@ -529,20 +534,40 @@ void run_i2c()
     esp_err_t ret;
 
     ret = sn65dsi83_enable_test_pattern(dev_handle);
+    ret = register_write_byte(dev_handle, 0x18, 0x10);// Enable channel A
+    ret = register_write_byte(dev_handle, 0x19, 0x00);// LVDS Voltage level 
     //vTaskDelay(pdMS_TO_TICKS(5000));
     //ret = register_write_byte(dev_handle, 0x3C, 0x00);
     //ret = register_write_byte(dev_handle, 0x3C, 0x10);
     if (ret != ESP_OK) {
         printf("I2C write failed, err=0x%x\n", ret);
     }
+    ret = register_write_byte(dev_handle, REG_RC_RESET, BIT(0));
+    if (ret != ESP_OK) ESP_LOGE(TAG, "Soft Reset error %s", ret);
+    vTaskDelay(10);
+
+
     ////while(1) {
     ////    sn65dsi83_state_machine(dev_handle, default_config);
     ////    vTaskDelay(pdMS_TO_TICKS(100));
     ////}
     //Again dump after TEST PATTERN
     while(1) {
+            ret = register_write_byte(dev_handle, 0xE5, 0x01);//Clear error
         dump_registers(dev_handle, 0x00, 0xFF);
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(500));
+        //en_assert(10, 1); //LCD standby
+        static int innit = 0;
+        if (innit == 1) {
+            ret = register_write_byte(dev_handle, 0xE5, 0x01);//Clear error
+            innit = 2;
+        }
+        if (0 == innit) {
+            uint8_t dd=0;
+            register_read(dev_handle, 0x0A, &dd, 1);
+            if(0x80 & dd)
+                innit = 1;
+        }
     }
     /* Read the SN65DSI83's PLL register, it should have the value 0x83(locked) */
     //ESP_ERROR_CHECK(register_read(dev_handle, 0x0a, data, 1));
