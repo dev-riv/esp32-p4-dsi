@@ -131,12 +131,14 @@ static esp_err_t sn65dsi83_enable_test_pattern(i2c_master_dev_handle_t dev_handl
 {
     esp_err_t ret;
     //ADDitional start 
-    ret = register_write_byte(dev_handle, 0x0a, 0x04);// clock range 62.5-87.5
+    ret = register_write_byte(dev_handle, 0x0a, 0x05);// clock range 62.5-87.5, 450 / 6 = 75MHz
     if (ret != ESP_OK) return ret;
-    ret = register_write_byte(dev_handle, 0x0b, 0x01);// Ref Clock multy 
+    ret = register_write_byte(dev_handle, 0x0b, 0x28);// set Ref clock devider to 6
 
     if (ret != ESP_OK) return ret;
     ret = register_write_byte(dev_handle, 0x0d, 0x01);// Pll en 01
+    if (ret != ESP_OK) return ret;
+    ret = register_write_byte(dev_handle, 0x12, 0x5a);// Set DSI input clock to 450 MHz
     if (ret != ESP_OK) return ret;
 
     // Active line length (horizontal resolution) = 1280 (0x500) addr 0x20-21

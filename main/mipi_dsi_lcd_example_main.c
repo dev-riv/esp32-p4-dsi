@@ -43,16 +43,16 @@ static const char *TAG = "example";
 #define EXAMPLE_MIPI_DSI_LCD_VBP      16
 #define EXAMPLE_MIPI_DSI_LCD_VFP      16
 #elif CONFIG_EXAMPLE_LCD_USE_EK79007
-// Refresh Rate = 50000000/(10+120+120+1024)/(10+23+12+600) = 60Hz
-#define EXAMPLE_MIPI_DSI_DPI_CLK_MHZ  50
-#define EXAMPLE_MIPI_DSI_LCD_H_RES    1024
-#define EXAMPLE_MIPI_DSI_LCD_V_RES    600
+// Refresh Rate = 73000000/(20+68+72+1280)/(10+13+15+800) = 60Hz
+#define EXAMPLE_MIPI_DSI_DPI_CLK_MHZ  73
+#define EXAMPLE_MIPI_DSI_LCD_H_RES    1280
+#define EXAMPLE_MIPI_DSI_LCD_V_RES    800
 #define EXAMPLE_MIPI_DSI_LCD_HSYNC    20
-#define EXAMPLE_MIPI_DSI_LCD_HBP      160
-#define EXAMPLE_MIPI_DSI_LCD_HFP      160
+#define EXAMPLE_MIPI_DSI_LCD_HBP      68
+#define EXAMPLE_MIPI_DSI_LCD_HFP      72
 #define EXAMPLE_MIPI_DSI_LCD_VSYNC    10
-#define EXAMPLE_MIPI_DSI_LCD_VBP      23
-#define EXAMPLE_MIPI_DSI_LCD_VFP      12
+#define EXAMPLE_MIPI_DSI_LCD_VBP      13
+#define EXAMPLE_MIPI_DSI_LCD_VFP      15
 #endif
 
 // Refresh Rate = 48000000/(10+120+120+1024)/(1+20+10+600) = 60Hz
@@ -67,7 +67,7 @@ static const char *TAG = "example";
 //#define EXAMPLE_MIPI_DSI_LCD_VFP      10
 
 #define EXAMPLE_MIPI_DSI_LANE_NUM          2    // 2 data lanes
-#define EXAMPLE_MIPI_DSI_LANE_BITRATE_MBPS 1000 // 1Gbps
+#define EXAMPLE_MIPI_DSI_LANE_BITRATE_MBPS 900 // 1Gbps
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// Please update the following configuration according to your Board Design //////////////////////////
@@ -221,38 +221,38 @@ void app_main(void)
     };
     ESP_ERROR_CHECK(esp_lcd_new_dsi_bus(&bus_config, &mipi_dsi_bus));
 
-/////////    ESP_LOGI(TAG, "Install MIPI DSI LCD control IO");
-/////////    esp_lcd_panel_io_handle_t mipi_dbi_io;
-/////////    // we use DBI interface to send LCD commands and parameters
-/////////    esp_lcd_dbi_io_config_t dbi_config = {
-/////////        .virtual_channel = 0,
-/////////        .lcd_cmd_bits = 8,   // according to the LCD spec
-/////////        .lcd_param_bits = 8, // according to the LCD spec
-/////////    };
-/////////    ESP_ERROR_CHECK(esp_lcd_new_panel_io_dbi(mipi_dsi_bus, &dbi_config, &mipi_dbi_io));
+    ESP_LOGI(TAG, "Install MIPI DSI LCD control IO");
+    esp_lcd_panel_io_handle_t mipi_dbi_io;
+    // we use DBI interface to send LCD commands and parameters
+    esp_lcd_dbi_io_config_t dbi_config = {
+        .virtual_channel = 0,
+        .lcd_cmd_bits = 8,   // according to the LCD spec
+        .lcd_param_bits = 8, // according to the LCD spec
+    };
+    ESP_ERROR_CHECK(esp_lcd_new_panel_io_dbi(mipi_dsi_bus, &dbi_config, &mipi_dbi_io));
 //////
-//////    ESP_LOGI(TAG, "Install MIPI DSI LCD data panel");
-//////    esp_lcd_panel_handle_t mipi_dpi_panel = NULL;
-//////    esp_lcd_dpi_panel_config_t dpi_config = {
-//////        .virtual_channel = 0,
-//////        .dpi_clk_src = MIPI_DSI_DPI_CLK_SRC_DEFAULT,
-//////        //.dpi_clk_src = MIPI_DSI_DPI_CLK_SRC_PLL_F160M,
-//////        .dpi_clock_freq_mhz = EXAMPLE_MIPI_DSI_DPI_CLK_MHZ,
-//////        .in_color_format = LCD_COLOR_FMT_RGB888,
-//////        .video_timing = {
-//////            .h_size = 1280,//EXAMPLE_MIPI_DSI_LCD_H_RES,
-//////            .v_size = 800,//EXAMPLE_MIPI_DSI_LCD_V_RES,
-//////            .hsync_back_porch = 88,//EXAMPLE_MIPI_DSI_LCD_HBP,
-//////            .hsync_pulse_width = 20,//EXAMPLE_MIPI_DSI_LCD_HSYNC,
-//////            .hsync_front_porch = 72,//EXAMPLE_MIPI_DSI_LCD_HFP,
-//////            .vsync_back_porch = 23,//EXAMPLE_MIPI_DSI_LCD_VBP,
-//////            .vsync_pulse_width = 10,//EXAMPLE_MIPI_DSI_LCD_VSYNC,
-//////            .vsync_front_porch = 15,//EXAMPLE_MIPI_DSI_LCD_VFP,
-//////        },
-////////#i//CONFIG_EXAMPLE_USE_DMA2D_COPY_FRAME
-//////        .flags.use_dma2d = true, // use DMA2D to copy draw buffer into frame buffer
-////////#e//if
-//////    };
+    ESP_LOGI(TAG, "Install MIPI DSI LCD data panel");
+    esp_lcd_panel_handle_t mipi_dpi_panel = NULL;
+    esp_lcd_dpi_panel_config_t dpi_config = {
+        .virtual_channel = 0,
+        .dpi_clk_src = MIPI_DSI_DPI_CLK_SRC_DEFAULT,
+        //.dpi_clk_src = MIPI_DSI_DPI_CLK_SRC_PLL_F160M,
+        .dpi_clock_freq_mhz = EXAMPLE_MIPI_DSI_DPI_CLK_MHZ,
+        .in_color_format = LCD_COLOR_FMT_RGB888,
+        .video_timing = {
+            .h_size = EXAMPLE_MIPI_DSI_LCD_H_RES,
+            .v_size = EXAMPLE_MIPI_DSI_LCD_V_RES,
+            .hsync_back_porch = EXAMPLE_MIPI_DSI_LCD_HBP,
+            .hsync_pulse_width = EXAMPLE_MIPI_DSI_LCD_HSYNC,
+            .hsync_front_porch = EXAMPLE_MIPI_DSI_LCD_HFP,
+            .vsync_back_porch = EXAMPLE_MIPI_DSI_LCD_VBP,
+            .vsync_pulse_width = EXAMPLE_MIPI_DSI_LCD_VSYNC,
+            .vsync_front_porch = EXAMPLE_MIPI_DSI_LCD_VFP,
+        },
+//#i//CONFIG_EXAMPLE_USE_DMA2D_COPY_FRAME
+        .flags.use_dma2d = true, // use DMA2D to copy draw buffer into frame buffer
+//#e//if
+    };
 //////
 //////#if CONFIG_EXAMPLE_LCD_USE_ILI9881C
 //////    ili9881c_vendor_config_t vendor_config = {
@@ -271,23 +271,23 @@ void app_main(void)
 //////    ESP_ERROR_CHECK(esp_lcd_new_panel_ili9881c(mipi_dbi_io, &lcd_dev_config, &mipi_dpi_panel));
 //////#elif CONFIG_EXAMPLE_LCD_USE_EK79007
 ////////#if CONFIG_EXAMPLE_LCD_USE_EK79007
-//////    ek79007_vendor_config_t vendor_config = {
-//////        .mipi_config = {
-//////            .dsi_bus = mipi_dsi_bus,
-//////            .dpi_config = &dpi_config,
-//////        },
-//////    };
-//////    esp_lcd_panel_dev_config_t lcd_dev_config = {
-//////        .reset_gpio_num = EXAMPLE_PIN_NUM_LCD_RST,
-//////        .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
-//////        .bits_per_pixel = 24,
-//////        .vendor_config = &vendor_config,
-//////    };
-//////    ESP_ERROR_CHECK(esp_lcd_new_panel_ek79007(mipi_dbi_io, &lcd_dev_config, &mipi_dpi_panel));
-//////#endif
-//////
-//////    ////////ESP_ERROR_CHECK(esp_lcd_panel_reset(mipi_dpi_panel));
-//////    ESP_ERROR_CHECK(esp_lcd_panel_init(mipi_dpi_panel));
+    ek79007_vendor_config_t vendor_config = {
+        .mipi_config = {
+            .dsi_bus = mipi_dsi_bus,
+            .dpi_config = &dpi_config,
+        },
+    };
+    esp_lcd_panel_dev_config_t lcd_dev_config = {
+        .reset_gpio_num = EXAMPLE_PIN_NUM_LCD_RST,
+        .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
+        .bits_per_pixel = 24,
+        .vendor_config = &vendor_config,
+    };
+    ESP_ERROR_CHECK(esp_lcd_new_panel_ek79007(mipi_dbi_io, &lcd_dev_config, &mipi_dpi_panel));
+//#endif
+
+    ESP_ERROR_CHECK(esp_lcd_panel_reset(mipi_dpi_panel));
+    ESP_ERROR_CHECK(esp_lcd_panel_init(mipi_dpi_panel));
     //// turn on backlight
     //example_bsp_set_lcd_backlight(EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
 
@@ -304,55 +304,55 @@ void app_main(void)
 
     // sn65 config
     i2c_cmd();
-   // ESP_LOGI(TAG, "Initialize LVGL library");
-   // lv_init();
-   // // create a lvgl display
-   // //lv_display_t *display = lv_display_create(EXAMPLE_MIPI_DSI_LCD_H_RES, EXAMPLE_MIPI_DSI_LCD_V_RES);
-   // lv_display_t *display = lv_display_create(1280, 800);
-   // // associate the mipi panel handle to the display
-   // lv_display_set_user_data(display, mipi_dpi_panel);
-   // // set color depth
-   //k lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB888);
-   // // create draw buffer
-   // void *buf1 = NULL;
-   // void *buf2 = NULL;
-   // ESP_LOGI(TAG, "Allocate separate LVGL draw buffers");
-   // // Note:
-   // // Keep the display buffer in **internal** RAM can speed up the UI because LVGL uses it a lot and it should have a fast access time
-   // // This example allocate the buffer from PSRAM mainly because we want to save the internal RAM
-   // size_t draw_buffer_sz = EXAMPLE_MIPI_DSI_LCD_H_RES * EXAMPLE_LVGL_DRAW_BUF_LINES * sizeof(lv_color_t);
-   // buf1 = heap_caps_malloc(draw_buffer_sz, MALLOC_CAP_SPIRAM);
-   // assert(buf1);
-   // buf2 = heap_caps_malloc(draw_buffer_sz, MALLOC_CAP_SPIRAM);
-   // assert(buf2);
-   // // initialize LVGL draw buffers
-   // lv_display_set_buffers(display, buf1, buf2, draw_buffer_sz, LV_DISPLAY_RENDER_MODE_PARTIAL);
-   // // set the callback which can copy the rendered image to an area of the display
-   // lv_display_set_flush_cb(display, example_lvgl_flush_cb);
+    ESP_LOGI(TAG, "Initialize LVGL library");
+    lv_init();
+    // create a lvgl display
+    lv_display_t *display = lv_display_create(EXAMPLE_MIPI_DSI_LCD_H_RES, EXAMPLE_MIPI_DSI_LCD_V_RES);
+    // lv_display_t *display = lv_display_create(1280, 800);
+    // // associate the mipi panel handle to the display
+    lv_display_set_user_data(display, mipi_dpi_panel);
+    // set color depth
+    lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB888);
+    // create draw buffer
+    void *buf1 = NULL;
+    void *buf2 = NULL;
+    ESP_LOGI(TAG, "Allocate separate LVGL draw buffers");
+    // Note:
+    // Keep the display buffer in **internal** RAM can speed up the UI because LVGL uses it a lot and it should have a fast access time
+    // This example allocate the buffer from PSRAM mainly because we want to save the internal RAM
+    size_t draw_buffer_sz = EXAMPLE_MIPI_DSI_LCD_H_RES * EXAMPLE_LVGL_DRAW_BUF_LINES * sizeof(lv_color_t);
+    buf1 = heap_caps_malloc(draw_buffer_sz, MALLOC_CAP_SPIRAM);
+    assert(buf1);
+    buf2 = heap_caps_malloc(draw_buffer_sz, MALLOC_CAP_SPIRAM);
+    assert(buf2);
+    // initialize LVGL draw buffers
+    lv_display_set_buffers(display, buf1, buf2, draw_buffer_sz, LV_DISPLAY_RENDER_MODE_PARTIAL);
+   // set the callback which can copy the rendered image to an area of the display
+   lv_display_set_flush_cb(display, example_lvgl_flush_cb);
 
-   // ESP_LOGI(TAG, "Register DPI panel event callback for LVGL flush ready notification");
-   // esp_lcd_dpi_panel_event_callbacks_t cbs = {
-   //     .on_color_trans_done = example_notify_lvgl_flush_ready,
+   ESP_LOGI(TAG, "Register DPI panel event callback for LVGL flush ready notification");
+   esp_lcd_dpi_panel_event_callbacks_t cbs = {
+       .on_color_trans_done = example_notify_lvgl_flush_ready,
 //#if// CONFIG_EXAMPLE_MONITOR_REFRESH_BY_GPIO
-   //     .on_refresh_done = example_monitor_refresh_rate,
+       .on_refresh_done = example_monitor_refresh_rate,
 //#en//dif
-   // };
-   // ESP_ERROR_CHECK(esp_lcd_dpi_panel_register_event_callbacks(mipi_dpi_panel, &cbs, display));
+   };
+   ESP_ERROR_CHECK(esp_lcd_dpi_panel_register_event_callbacks(mipi_dpi_panel, &cbs, display));
 
-   // ESP_LOGI(TAG, "Use esp_timer as LVGL tick timer");
-   // const esp_timer_create_args_t lvgl_tick_timer_args = {
-   //     .callback = &example_increase_lvgl_tick,
-   //     .name = "lvgl_tick"
-   // };
-   // esp_timer_handle_t lvgl_tick_timer = NULL;
-   // ESP_ERROR_CHECK(esp_timer_create(&lvgl_tick_timer_args, &lvgl_tick_timer));
-   // ESP_ERROR_CHECK(esp_timer_start_periodic(lvgl_tick_timer, EXAMPLE_LVGL_TICK_PERIOD_MS * 1000));
+   ESP_LOGI(TAG, "Use esp_timer as LVGL tick timer");
+   const esp_timer_create_args_t lvgl_tick_timer_args = {
+       .callback = &example_increase_lvgl_tick,
+       .name = "lvgl_tick"
+   };
+   esp_timer_handle_t lvgl_tick_timer = NULL;
+   ESP_ERROR_CHECK(esp_timer_create(&lvgl_tick_timer_args, &lvgl_tick_timer));
+   ESP_ERROR_CHECK(esp_timer_start_periodic(lvgl_tick_timer, EXAMPLE_LVGL_TICK_PERIOD_MS * 1000));
 
-   // ESP_LOGI(TAG, "Create LVGL task");
-   // xTaskCreate(example_lvgl_port_task, "LVGL", EXAMPLE_LVGL_TASK_STACK_SIZE, NULL, EXAMPLE_LVGL_TASK_PRIORITY, NULL);
+   ESP_LOGI(TAG, "Create LVGL task");
+   xTaskCreate(example_lvgl_port_task, "LVGL", EXAMPLE_LVGL_TASK_STACK_SIZE, NULL, EXAMPLE_LVGL_TASK_PRIORITY, NULL);
 
-   // ESP_LOGI(TAG, "Display LVGL Meter Widget");
-   // _lock_acquire(&lvgl_api_lock);
-   // example_lvgl_demo_ui(display);
-   // _lock_release(&lvgl_api_lock);
+   ESP_LOGI(TAG, "Display LVGL Meter Widget");
+   _lock_acquire(&lvgl_api_lock);
+   example_lvgl_demo_ui(display);
+   _lock_release(&lvgl_api_lock);
 }
