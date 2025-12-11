@@ -1,0 +1,6 @@
+## IDF Component Manager Manifest File
+dependencies:
+  esp32-p4-dsi:
+    version: '*'
+    path: ../../../esp32-p4-dsi
+  lvgl/lvgl: '*'
