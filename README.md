@@ -1,27 +1,35 @@
-# ESP LCD RVT101HVLNWC00 and sn65dsi83
+# 🖥️ ESP32-P4 LCD Driver  
+### Riverdi RVT101HVLNWC00 (10.1") + SN65DSI83
 
-Implementation of theLCD controller with esp_lcd component.
+ESP-IDF LCD panel driver for **Riverdi RVT101HVLNWC00 10.1" display** using the  
+**TI SN65DSI83 MIPI-DSI to LVDS bridge**, developed and tested on **ESP32-P4**.
 
-| LCD controller | Communication interface | Component name |                                   Link to datasheet                                   |
-| :------------: | :---------------------: | :------------: | :-----------------------------------------------------------------------------------:  |
+---
 
-**Note**: MIPI-DSI interface only supports ESP-IDF v5.3 and above versions.
+## 📌 Overview
 
-For more information on LCD, please refer to the [LCD documentation](https://docs.espressif.com/projects/esp-iot-solution/en/latest/display/lcd/index.html).
+- **MCU:** ESP32-P4  
+- **Display:** Riverdi RVT101HVLNWC00 (10.1")  
+- **Bridge IC:** SN65DSI83  
+- **Input:** MIPI-DSI  
+- **Output:** LVDS  
+- **Framework:** ESP-IDF `esp_lcd`
 
-## Add to project
+---
 
-Packages from this repository are uploaded to [Espressif's component service](https://components.espressif.com/).
-You can add them to your project via `idf.py add-dependancy`, e.g.
+## ⚙️ Requirements
 
-```
-    idf.py add-dependency ""
-```
+- ESP-IDF **v5.3+**
+- ESP32-P4 target
+- MIPI-DSI enabled
 
-Alternatively, you can create `idf_component.yml`. More is in [Espressif's documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-component-manager.html).
+> ⚠️ MIPI-DSI is supported starting from ESP-IDF v5.3.
 
-    ESP_ERROR_CHECK(esp_lcd_new_panel_sn65dsi(mipi_dbi_io, &panel_config, &panel_handle));
-    ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
-    ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
-    ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(panel_handle, true));
-```
+---
+
+## 🚀 Usage
+
+### Add to project
+
+```text
+components/esp32p4-RVT101
