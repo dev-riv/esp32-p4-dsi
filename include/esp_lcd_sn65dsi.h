@@ -1,7 +1,4 @@
 /*
- * SPDX-FileCopyrightText: 2023 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: Apache-2.0
  */
 
 #pragma once
@@ -49,7 +46,7 @@ typedef struct {
 } sn65dsi_vendor_config_t;
 
 /**
- * @brief Create LCD panel for model EK79007
+ * @brief Create LCD panel for model rvt101-sn65
  *
  * @note  Vendor specific initialization can be different between manufacturers, should consult the LCD supplier for initialization sequence code.
  *

@@ -1,7 +1,4 @@
 /*
- * SPDX-FileCopyrightText: 2023 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: Apache-2.0
  */
 
 #include "soc/soc_caps.h"
@@ -18,7 +15,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
-#include "driver/i2c.h"
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "esp_heap_caps.h"
@@ -35,7 +31,6 @@
 #include "esp_lcd_sn65dsi.h"
 #include "lvgl.h"
 
-//#include "sn65_conf.h"
 
 #define TEST_LCD_H_RES                  (1280)
 #define TEST_LCD_V_RES                  (800)
@@ -58,7 +53,6 @@
 #endif
 
 #define TEST_DELAY_TIME_MS                      (3000)
-
 #define TEST_MIPI_DSI_PHY_PWR_LDO_CHAN          (3)
 #define TEST_MIPI_DSI_PHY_PWR_LDO_VOLTAGE_MV    (2500)
 
@@ -69,15 +63,15 @@
 #define EXAMPLE_LVGL_TASK_MIN_DELAY_MS 1000 / CONFIG_FREERTOS_HZ
 
 
-static char *TAG = "TEST SN65 with disp";
+static char *TAG = "TEST RVT10'disp + sn65dsi83 bridge";
 static esp_ldo_channel_handle_t ldo_mipi_phy = NULL;
 static esp_lcd_panel_handle_t panel_handle = NULL;
 static esp_lcd_dsi_bus_handle_t mipi_dsi_bus = NULL;
 static esp_lcd_panel_io_handle_t mipi_dbi_io = NULL;
 static SemaphoreHandle_t refresh_finish = NULL;
 
-
-// LVGL library is not thread-safe, this example will call LVGL APIs from different           tasks, so use a mutex to protect it
+// LVGL library is not thread-safe, this example will call LVGL APIs from different tasks,
+// so use a mutex to protect it
 static _lock_t lvgl_api_lock;
 
 extern void example_lvgl_demo_ui(lv_display_t *disp);
@@ -122,14 +116,12 @@ static void example_lvgl_port_task(void *arg)
     }
 }
 
-
 static bool example_notify_lvgl_flush_ready(esp_lcd_panel_handle_t panel, esp_lcd_dpi_panel_event_data_t *edata, void *user_ctx)
 {
     lv_display_t *disp = (lv_display_t *)user_ctx;
     lv_display_flush_ready(disp);
     return false;
 }
-
 
 IRAM_ATTR static bool test_notify_refresh_ready(esp_lcd_panel_handle_t panel, esp_lcd_dpi_panel_event_data_t *edata, void *user_ctx)
 {
@@ -145,8 +137,6 @@ static void test_init_sn65(void)
 {
     // Turn on the power for MIPI DSI PHY,
     // so it can go from "No Power" state to "Shutdown" state
-
-    //init_sn65();
 
 #ifdef TEST_MIPI_DSI_PHY_PWR_LDO_CHAN
     ESP_LOGI(TAG, "MIPI DSI PHY Powered on");
@@ -253,27 +243,10 @@ static void test_draw_color_bar(esp_lcd_panel_handle_t panel_handle, uint16_t h_
     free(color);
 }
 
-//TEST_CASE("test ek79007 to draw pattern with MIPI interface", "[ek79007][draw_pattern]")
-//{
-//    ESP_LOGI(TAG, "Initialize LCD device");
-//    //test_init_lcd();
-//    test_init_sn65();
-//
-//    ESP_LOGI(TAG, "Show color bar pattern drawn by hardware 1");
-//    TEST_ESP_OK(esp_lcd_dpi_panel_set_pattern(panel_handle, MIPI_DSI_PATTERN_BAR_VERTICAL));
-//    vTaskDelay(pdMS_TO_TICKS(TEST_DELAY_TIME_MS));
-//    TEST_ESP_OK(esp_lcd_dpi_panel_set_pattern(panel_handle, MIPI_DSI_PATTERN_BAR_HORIZONTAL));
-//    vTaskDelay(pdMS_TO_TICKS(TEST_DELAY_TIME_MS));
-//    TEST_ESP_OK(esp_lcd_dpi_panel_set_pattern(panel_handle, MIPI_DSI_PATTERN_NONE));
-//
-//    ESP_LOGI(TAG, "Deinitialize LCD device");
-//    test_deinit_lcd();
-//}
 
-TEST_CASE("test ek79007 to draw pattern with MIPI interface", "[ek79007][draw_pattern]")
+TEST_CASE("test RVT101SN65 to draw pattern with MIPI interface", "[rvt101sn65][draw_lvgl_example]")
 {
     ESP_LOGI(TAG, "Initialize LCD device");
-    //test_init_lcd();
     test_init_sn65();
 
     ESP_LOGI(TAG, "Initialize LVGL library");
@@ -340,15 +313,30 @@ TEST_CASE("test ek79007 to draw pattern with MIPI interface", "[ek79007][draw_pa
     //test_deinit_lcd();
 }
 
-TEST_CASE("test ek79007 to draw color bar with MIPI interface", "[ek79007][draw_color_bar]")
+TEST_CASE("test RVT101SN65 to draw color bar with MIPI interface", "[rvt101sn65][draw_color_bar]")
 {
     ESP_LOGI(TAG, "Initialize LCD device");
-    //test_init_lcd();
     test_init_sn65();
 
     ESP_LOGI(TAG, "Show color bar drawn by software 2");
     test_draw_color_bar(panel_handle, TEST_LCD_H_RES, TEST_LCD_V_RES);
     vTaskDelay(pdMS_TO_TICKS(TEST_DELAY_TIME_MS));
+
+    ESP_LOGI(TAG, "Deinitialize LCD device");
+    test_deinit_lcd();
+}
+
+TEST_CASE("test RVT101SN65 to draw pattern with MIPI interface", "[rvt101sn65][draw_pattern]")
+{
+    ESP_LOGI(TAG, "Initialize LCD device");
+    test_init_sn65();
+
+    ESP_LOGI(TAG, "Show color bar pattern drawn by hardware 1");
+    TEST_ESP_OK(esp_lcd_dpi_panel_set_pattern(panel_handle, MIPI_DSI_PATTERN_BAR_VERTICAL));
+    vTaskDelay(pdMS_TO_TICKS(TEST_DELAY_TIME_MS));
+    TEST_ESP_OK(esp_lcd_dpi_panel_set_pattern(panel_handle, MIPI_DSI_PATTERN_BAR_HORIZONTAL));
+    vTaskDelay(pdMS_TO_TICKS(TEST_DELAY_TIME_MS));
+    TEST_ESP_OK(esp_lcd_dpi_panel_set_pattern(panel_handle, MIPI_DSI_PATTERN_NONE));
 
     ESP_LOGI(TAG, "Deinitialize LCD device");
     test_deinit_lcd();
@@ -378,7 +366,7 @@ void app_main(void)
 {
     /**
      *  ______     __ ___  ___  _ _____ ____  ____  ___________
-     * |  _ \ \   / / |_ |/ _ \/ | ____/ ___||  _ \|___ /___ \ |
+     * |  _ \ \   / /___ |/ _ \/ | ____/ ___||  _ \|___ /___ \ |
      * | |_) \ \ / /| | | | | | | |  _| \___ \| |_) | |_ \ __) |
      * |  _ < \ V / | | | | |_| | | |___ ___) |  __/ ___) / __/
      * |_| \_\ \_/  |_|_|\___/|_|_____|____/|_|   |____/_____|

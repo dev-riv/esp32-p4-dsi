@@ -1,12 +1,12 @@
-#include "mcp23017.h"
 #include "driver/i2c_master.h"   // uses ESP-IDF's example helper header (wraps standard i2c_master functions)
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_check.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
 #include <string.h>
+
+#include "mcp23017.h"
 
 static const char *TAG = "mcp23017";
 static i2c_port_t s_i2c_num = I2C_NUM_0;

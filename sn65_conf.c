@@ -1,17 +1,18 @@
-#include "sn65_conf.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "esp_timer.h"
+
 #include "mcp23017.h"
+#include "sn65_conf.h"
 
 #define I2C_SN65DSI83_ADDR  0x2C
-#define I2C_MASTER_SCL_IO   49//8      // <-- change for own hardware
-#define I2C_MASTER_SDA_IO   50//7
+#define I2C_MASTER_SCL_IO   49      
+#define I2C_MASTER_SDA_IO   50
 #define I2C_MASTER_FREQ_HZ  100000 // KHz
 #define I2C_PORT            I2C_NUM_1 
 
-#define TAG                 "SN65_CONFIG"
+#define TAG                 "BRIDGE_CONFIG"
 
 #define I2C_MASTER_TIMEOUT_MS (1000)
 
@@ -117,7 +118,6 @@ void sn_pll_en(bool en)
 
 void sn_chip_en(bool en)
 {
-    //mcp23x17_set_level(&mcp_dev, 11, en);
     en_assert(11, en);
     ESP_LOGI(TAG, "Set SN65 EN pin %d", en);
 }
@@ -175,36 +175,12 @@ void show_regs()
     dump_registers(s_dev_handle, 0x00, 0xFF);
 }
 
-//static esp_err_t additional_conf(i2c_master_dev_handle_t dev_handle)
-//{
-//    esp_err_t ret;
-//    ret = register_write_byte(dev_handle, 0x0e, 0x01);// * 
-//    if (ret != ESP_OK) return ret;
-//    ret = register_write_byte(dev_handle, 0x0f, 0x01);// * 
-//    if (ret != ESP_OK) return ret;
-//
-//    ret = register_write_byte(dev_handle, 0x13, 0x5a);// *
-//    if (ret != ESP_OK) return ret;
-//    ret = register_write_byte(dev_handle, 0x14, 0x5a);// *
-//    if (ret != ESP_OK) return ret;
-//    ret = register_write_byte(dev_handle, 0x15, 0x5a);// *
-//    if (ret != ESP_OK) return ret;
-//    ret = register_write_byte(dev_handle, 0x16, 0x5a);// *
-//    if (ret != ESP_OK) return ret;
-//    ret = register_write_byte(dev_handle, 0x17, 0x5a);// *
-//    if (ret != ESP_OK) return ret;
-//
-//    return ESP_OK;
-//}
-
-// Configure SN65DSI83 test pattern registers
-// Example timing: 1280x800 @ 60 Hz (adjust values for your panel)
+// Configure SN65DSI83 registers
+// timing: 1280x800 @ 60 Hz ()
 static esp_err_t sn65dsi83_enable_test_pattern(i2c_master_dev_handle_t dev_handle)
 {
     esp_err_t ret;
 
-    //ret = additional_conf(s_dev_handle);
-    //if (ret != ESP_OK) return ret;
     // PLL to 0 to correct config 0A & 0B
     ret = register_write_byte(dev_handle, 0x0d, 0x00);// Pll en 01
     if (ret != ESP_OK) return ret;
@@ -217,8 +193,6 @@ static esp_err_t sn65dsi83_enable_test_pattern(i2c_master_dev_handle_t dev_handl
     ret = register_write_byte(dev_handle, 0x0b, 0x28);// DSI clock divider 
     if (ret != ESP_OK) return ret;
 
-    //ret = register_write_byte(dev_handle, 0x0d, 0x01);// Pll en 01
-    //if (ret != ESP_OK) return ret;
     // Choosen 2 DSI lanes
     ret = register_write_byte(dev_handle, 0x10, 0x30);// Set DSI lanes
     if (ret != ESP_OK) return ret;
@@ -327,55 +301,6 @@ void sn65dsi_fill_regs()
 
     dump_registers(s_dev_handle, 0x00, 0xFF);
 }
-
-//static void mcp23017_init()
-//{
-//    ESP_ERROR_CHECK(i2cdev_init());
-//
-//    uint8_t mcp_i2c_addr = 0x21;
-//    uint8_t mcp_i2c_sda_num = 7;
-//    uint8_t mcp_i2c_scl_num = 6;
-//    uint8_t mcp_i2c_port = 0;
-//
-//    ESP_ERROR_CHECK(mcp23x17_init_desc(&mcp_dev, mcp_i2c_addr, mcp_i2c_port,
-//        mcp_i2c_sda_num, mcp_i2c_scl_num));
-//
-//    //mcp23x17_set_mode(&mcp_dev, pin_num, MCP23X17_GPIO_INPUT);
-//    // for buzzer
-//    mcp23x17_set_mode(&mcp_dev, 5, MCP23X17_GPIO_OUTPUT);
-//    vTaskDelay(pdMS_TO_TICKS(50));
-//    // for display brightness
-//    mcp23x17_set_mode(&mcp_dev, 7, MCP23X17_GPIO_OUTPUT);
-//    vTaskDelay(pdMS_TO_TICKS(50));
-//    // for LCD reset
-//    mcp23x17_set_mode(&mcp_dev, 9, MCP23X17_GPIO_OUTPUT);
-//    vTaskDelay(pdMS_TO_TICKS(50));
-//    // for LCD standby control (3.3v ON with HIGH)
-//    mcp23x17_set_mode(&mcp_dev, 10, MCP23X17_GPIO_OUTPUT);
-//    vTaskDelay(pdMS_TO_TICKS(50));
-//    // for sn65 enable to work
-//    mcp23x17_set_mode(&mcp_dev, 11, MCP23X17_GPIO_OUTPUT);
-//
-//    vTaskDelay(pdMS_TO_TICKS(50));
-//    mcp23x17_set_level(&mcp_dev, 7, 1); 
-//    vTaskDelay(pdMS_TO_TICKS(50));
-//    mcp23x17_set_level(&mcp_dev, 9, 1); 
-//    vTaskDelay(pdMS_TO_TICKS(50));
-//    mcp23x17_set_level(&mcp_dev, 10, 1); 
-//    vTaskDelay(pdMS_TO_TICKS(50));
-//    mcp23x17_set_level(&mcp_dev, 11, 1); 
-//
-//    // trigger buzzer as success config
-//    for(int i = 0; i < 5; i++) {
-//
-//        mcp23x17_set_level(&mcp_dev, 5, 1); 
-//        vTaskDelay(pdMS_TO_TICKS(80));
-//        mcp23x17_set_level(&mcp_dev, 5, 0); 
-//        vTaskDelay(pdMS_TO_TICKS(160));
-//    }
-//}
-
-
 
 void sn65dsi_deinit()
 {

@@ -39,7 +39,8 @@ typedef struct {
     esp_err_t (*init)(esp_lcd_panel_t *panel);
 } sn65dsi_panel_t;
 
-static const char *TAG = "sn65dsi riv10inch";
+static const char *SN65_TAG = "sn65dsi_rvt101";
+
 static int init_t = 0;
 
 static mipi_dsi_hal_context_t *s_hal = NULL;
@@ -87,24 +88,24 @@ static esp_err_t configure_mode(bool en)
 esp_err_t esp_lcd_new_panel_sn65dsi(const esp_lcd_panel_io_handle_t io,
     const esp_lcd_panel_dev_config_t *panel_dev_config, esp_lcd_panel_handle_t *ret_panel)
 {
-    ESP_LOGI(TAG, "version: %d.%d.%d", ESP_LCD_SN65DSI_VER_MAJOR,
+    ESP_LOGI(SN65_TAG, "version: %d.%d.%d", ESP_LCD_SN65DSI_VER_MAJOR,
         ESP_LCD_SN65DSI_VER_MINOR, ESP_LCD_SN65DSI_VER_PATCH);
 
     ESP_RETURN_ON_FALSE(io && panel_dev_config &&
-        ret_panel, ESP_ERR_INVALID_ARG, TAG, "invalid arguments");
+        ret_panel, ESP_ERR_INVALID_ARG, SN65_TAG, "invalid arguments");
 
     sn65dsi_vendor_config_t *vendor_config =
         (sn65dsi_vendor_config_t *)panel_dev_config->vendor_config;
 
     ESP_RETURN_ON_FALSE(vendor_config && vendor_config->mipi_config.dpi_config &&
-        vendor_config->mipi_config.dsi_bus, ESP_ERR_INVALID_ARG, TAG, "invalid vendor config");
+        vendor_config->mipi_config.dsi_bus, ESP_ERR_INVALID_ARG, SN65_TAG, "invalid vendor config");
 
     // Assigne to global pointer to controll bus
     s_hal = &vendor_config->mipi_config.dsi_bus->hal;
 
     esp_err_t ret = ESP_OK;
     sn65dsi_panel_t *sn65dsi = (sn65dsi_panel_t *)calloc(1, sizeof(sn65dsi_panel_t));
-    ESP_RETURN_ON_FALSE(sn65dsi, ESP_ERR_NO_MEM, TAG, "no mem for sn65dsi bridge panel");
+    ESP_RETURN_ON_FALSE(sn65dsi, ESP_ERR_NO_MEM, SN65_TAG, "no mem for sn65dsi bridge panel");
 
     sn65dsi->io = io;
     sn65dsi->init_cmds = vendor_config->init_cmds;
@@ -117,8 +118,8 @@ esp_err_t esp_lcd_new_panel_sn65dsi(const esp_lcd_panel_io_handle_t io,
     // Create MIPI DPI panel
     ESP_GOTO_ON_ERROR(esp_lcd_new_panel_dpi(vendor_config->mipi_config.dsi_bus,
         vendor_config->mipi_config.dpi_config, ret_panel),
-        err, TAG, "create MIPI DPI panel failed");
-    ESP_LOGD(TAG, "new MIPI DPI panel @%p", *ret_panel);
+        err, SN65_TAG, "create MIPI DPI panel failed");
+    ESP_LOGD(SN65_TAG, "new MIPI DPI panel @%p", *ret_panel);
 
     // Save the original functions of MIPI DPI panel
     sn65dsi->del = (*ret_panel)->del;
@@ -130,7 +131,7 @@ esp_err_t esp_lcd_new_panel_sn65dsi(const esp_lcd_panel_io_handle_t io,
     (*ret_panel)->mirror = panel_sn65dsi_mirror;
     (*ret_panel)->invert_color = panel_sn65dsi_invert_color;
     (*ret_panel)->user_data = sn65dsi;
-    ESP_LOGD(TAG, "new sn65dsi panel @%p", sn65dsi);
+    ESP_LOGD(SN65_TAG, "new sn65dsi panel @%p", sn65dsi);
 
     return ESP_OK;
 
@@ -166,15 +167,14 @@ static esp_err_t panel_sn65dsi_del(esp_lcd_panel_t *panel)
     sn65dsi_panel_t *sn65dsi = (sn65dsi_panel_t *)panel->user_data;
 
     // Delete MIPI DPI panel
-    ESP_RETURN_ON_ERROR(sn65dsi->del(panel), TAG, "del sn65dsi panel failed");
+    ESP_RETURN_ON_ERROR(sn65dsi->del(panel), SN65_TAG, "del sn65dsi panel failed");
     if (sn65dsi->reset_gpio_num >= 0) {
         gpio_reset_pin(sn65dsi->reset_gpio_num);
     }
     // REMOVE sn65, mcp23017, Brightness and disp reset to low,
     sn65dsi_deinit();
-    ESP_LOGI(TAG, "DELETE SN65,MCP, DIPS BRIGHTNESS AND RESET TO LOW");
+    ESP_LOGI(SN65_TAG, "DELETE SN65,MCP, DIPS BRIGHTNESS AND RESET TO LOW");
     
-    ESP_LOGD(TAG, "del sn65dsi panel @%p", sn65dsi);
     free(sn65dsi);
 
     return ESP_OK;
@@ -182,13 +182,13 @@ static esp_err_t panel_sn65dsi_del(esp_lcd_panel_t *panel)
 
 static esp_err_t panel_sn65dsi_init(esp_lcd_panel_t *panel)
 {
-    ESP_LOGI(TAG, "PANEL INIT %d time", init_t);
+    ESP_LOGI(SN65_TAG, "PANEL INIT %d time", init_t);
 
     sn65dsi_panel_t *sn65dsi = (sn65dsi_panel_t *)panel->user_data;
 
-    ESP_RETURN_ON_ERROR(panel_sn65dsi_send_init_cmds(sn65dsi), TAG, "send init commands failed");
+    ESP_RETURN_ON_ERROR(panel_sn65dsi_send_init_cmds(sn65dsi), SN65_TAG, "send init commands failed");
 
-    ESP_RETURN_ON_ERROR(sn65dsi->init(panel), TAG, "init MIPI DPI panel failed");
+    ESP_RETURN_ON_ERROR(sn65dsi->init(panel), SN65_TAG, "init MIPI DPI panel failed");
 
     configure_mode(true);
     vTaskDelay(pdMS_TO_TICKS(100));
@@ -201,16 +201,13 @@ static esp_err_t panel_sn65dsi_init(esp_lcd_panel_t *panel)
     sn_soft_reset(true);
     vTaskDelay(pdMS_TO_TICKS(12));
 
-    bool k = is_sn_pll_locked();
-    ESP_LOGI(TAG, "PLL LOCK %d", k); 
-
     configure_mode(false);
 
     clear_error_reg();
     //show_regs();
 
-    k = is_sn_pll_locked();
-    ESP_LOGI(TAG, "PLL LOCK %d", k); 
+    bool k = is_sn_pll_locked();
+    ESP_LOGI(SN65_TAG, "PLL LOCK %d", k); 
 
     return ESP_OK;
 }
